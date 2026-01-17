@@ -12,9 +12,13 @@ echo -e "${BoldRed}[Building N.P.A. on Linux]${Reset}"
 
 # Step 00. Checking Environment
 echo -e "${BoldRed}[Step 00. Checking Environment...]${Reset}"
-
 if ! command -v python3 &> /dev/null; then
     echo -e "${BoldRed}[ERROR] Python3 is not installed or not added to PATH.${Reset}"
+    read -p "Press enter to exit..."
+    exit 1
+fi
+if ! command -v patchelf &> /dev/null; then
+    echo -e "${BoldRed}[ERROR] Patchelf is not installed or not added to PATH. Please run 'apt\yum\deb install patchelf'${Reset}"
     read -p "Press enter to exit..."
     exit 1
 fi
@@ -42,7 +46,7 @@ echo -e "${BoldRed}[Step 02. Creating Virtual Environment...]${Reset}"
 if [ -d "npa" ]; then
     rm -rf npa
 fi
-python3 -m venv npa
+python3 -m venv --system-site-packages npa
 
 # Step 03. Activating Virtual Environment
 echo -e "${BoldRed}[Step 03. Activating Virtual Environment...]${Reset}"
@@ -50,7 +54,10 @@ source ./npa/bin/activate
 
 # Step 04. Installing Dependencies
 echo -e "${BoldRed}[Step 04. Installing Dependencies...]${Reset}"
+apt update
+apt install -y python3-pip
 pip install -r requirements.txt
+apt install -y python3-gi python3-gi-cairo gir1.2-gtk-3.0 gir1.2-webkit2-4.1
 
 # Step 05. Building
 echo -e "${BoldRed}[Step 05. Building...]${Reset}"
@@ -67,6 +74,8 @@ python3 -m nuitka --onefile --standalone \
 --product-version=1.0.0.0 \
 --file-description="N.P.A.-'Nuclear-Powered-Level' Paper Analyzer & Translator" \
 --copyright="Copyright (c) 2025~2026 DuYu (qluduyu09@163.com; 11250717@stu.lzjtu.edu.cn), Lanzhou Jiaotong University" \
+--include-package=gi \
+--include-package-data=gi \
 main.py
 
 # Step 06. Build Completed and Clear Virtual Environment
