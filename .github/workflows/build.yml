@@ -1,0 +1,78 @@
+name: Build N.P.A. Multi-Platform
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false # 如果一个系统失败了，不要取消其他系统的构建
+      matrix:
+        include:
+          # Windows 配置
+          - os: windows-latest
+            script_name: build_windows.bat
+            artifact_name: npa_windows
+            output_path: "*.exe"
+
+          # Linux 配置
+          - os: ubuntu-latest
+            script_name: build_linux.sh
+            artifact_name: npa_linux
+            output_path: "npa_*linux*"
+
+          # macOS 配置
+          - os: macos-latest
+            script_name: build_macos.sh
+            artifact_name: npa_macos
+            # macOS 生成的是 .app 目录，在步骤里会把它压缩，所以这里上传 tar.gz
+            output_path: "NPA_macOS.tar.gz"
+
+    steps:
+      # 1. 拉取私有仓库代码
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. 设置 Python 环境 (官方 CPython)
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip' # 开启缓存，加快依赖安装速度
+
+      # 3. 执行 Windows 构建脚本
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          call ${{ matrix.script_name }}
+
+      # 4. 执行 Linux 构建脚本
+      - name: Build (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          chmod +x ${{ matrix.script_name }}
+          ./${{ matrix.script_name }}
+
+      # 5. 执行 macOS 构建脚本 (包含压缩步骤)
+      - name: Build (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          chmod +x ${{ matrix.script_name }}
+          ./${{ matrix.script_name }}
+          
+          # 注意：macOS 生成的是 .app 文件夹。
+          # 直接上传文件夹在非 Mac 系统下载后会丢失可执行权限。
+          # 所以必须打包成 tar.gz
+          echo "Compressing App Bundle..."
+          tar -czf NPA_macOS.tar.gz *.app
+
+      # 6. 上传构建产物
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.output_path }}
+          if-no-files-found: error
