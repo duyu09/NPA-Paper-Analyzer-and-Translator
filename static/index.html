@@ -1,0 +1,771 @@
+<!-- Copyright © 2025~2026 DuYu (qluduyu09@163.com; 11250717@stu.lzjtu.edu.cn), Lanzhou Jiaotong University -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>“核动力”——PDF及Markdown论文解析&翻译器 (@duyu09 - 11250717@stu.lzjtu.edu.cn)</title>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script src="./js/marked.min.js"></script>
+    <script src="./js/tex-mml-chtml.js"></script>
+    <script src="./js/t-loading.js"></script>
+    <style>
+        :root {
+            --border-color: #d0d7de;
+            --header-bg: #f6f8fa;
+            --header-height: 32px;
+            --control-height: 60px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-color: #fff;
+        }
+
+        /* 布局 */
+        .main-container {
+            flex: 1;
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            gap: 12px;
+            padding: 12px;
+            min-height: 0;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            min-height: 0;
+        }
+
+        /* 区块 */
+        .block {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            min-width: 0;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .block-header {
+            height: var(--header-height);
+            background: var(--header-bg);
+            padding: 0 10px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            /* 加深颜色 */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            user-select: none;
+            --webkit-user-select: none;
+        }
+
+        /* 文本区域 - 代码字体保持 Consolas */
+        textarea {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            resize: none;
+            outline: none;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #333;
+            overflow-y: auto;
+            min-height: 0;
+        }
+
+        textarea:read-only {
+            background-color: #f6f8fa;
+            color: #666;
+        }
+
+        /* 预览区域 */
+        .preview {
+            flex: 1;
+            padding: 12px;
+            overflow-y: auto;
+            min-height: 0;
+            font-family: "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+            font-size: 14px;
+            line-height: 1.6;
+            color: #24292f;
+            word-wrap: break-word;
+            scroll-behavior: smooth;
+        }
+
+        /* 预览细节 */
+        .preview h1,
+        .preview h2 {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.3em;
+            margin-top: 10px;
+        }
+
+        .preview pre {
+            background: #f6f8fa;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin-bottom: 10px;
+        }
+
+        .preview code {
+            font-family: Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 85%;
+            background-color: rgba(175, 184, 193, 0.2);
+            padding: 0.2em 0.4em;
+            border-radius: 6px;
+        }
+
+        .preview pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        .preview img {
+            max-width: 100%;
+        }
+
+        .preview blockquote {
+            border-left: 4px solid #d0d7de;
+            margin: 0;
+            padding-left: 10px;
+            color: #666;
+        }
+
+        /* 底部控制区 */
+        .controls {
+            height: var(--control-height);
+            background: #f6f8fa;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            gap: 12px;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        select,
+        input {
+            padding: 5px 8px;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            font-size: 13px;
+            height: 32px;
+            background: white;
+            font-family: inherit;
+        }
+
+        input:disabled,
+        select:disabled {
+            background-color: #f6f8fa;
+            color: #57606a;
+        }
+
+        button {
+            height: 32px;
+            padding: 0 16px;
+            border: 1px solid rgba(27, 31, 36, 0.15);
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+
+        button:disabled {
+            background-color: #f6f8fa;
+            color: #8c959f;
+            cursor: not-allowed;
+            border-color: #d0d7de;
+        }
+
+        .btn-primary {
+            background-color: #2da44e;
+            color: #fff;
+            border-color: rgba(27, 31, 36, 0.15);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: #2c974b;
+        }
+
+        .btn-danger {
+            background-color: #cf222e;
+            color: #fff;
+            border-color: rgba(27, 31, 36, 0.15);
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background-color: #a40e26;
+        }
+
+        .btn-secondary {
+            background-color: #f6f8fa;
+            color: #24292f;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background-color: #f3f4f6;
+        }
+
+        .icon-btn {
+            font-size: 12px;
+            padding: 2px 8px;
+            height: 24px;
+            line-height: 20px;
+            background: #fff;
+            border: 1px solid #d0d7de;
+        }
+
+        .icon-btn:hover {
+            background-color: #f3f4f6;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d0d7de;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #afb8c1;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        /* =========================================
+   针对 #inputPreview 和 #outputPreview 的表格样式
+   修正版：严格限制宽度，仅在高度上自适应
+   ========================================= */
+
+        /* 1. 基础表格容器设置 */
+        /* 使用空格选择器，选中所有深层嵌套的表格 */
+        #inputPreview table,
+        #print-container>table table,
+        #outputPreview table {
+            width: 100%;
+            /* 核心修正：最大宽度限制，防止溢出 */
+            max-width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+
+            /* 维持原要求的字体设置 */
+            font-size: 15px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #333;
+
+            /* 核心修正：默认布局算法，配合 max-width 能够自适应 */
+            table-layout: auto;
+        }
+
+        /* 2. 表头样式 */
+        #inputPreview table thead tr,
+        #print-container>table table thead tr,
+        #outputPreview table thead tr {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            text-align: left;
+        }
+
+        #inputPreview table th,
+        #print-container>table table th,
+        #outputPreview table th {
+            /* 调整：减少左右 padding (8px)，防止列多时挤压内容；保持上下 padding (12px) 维持高度美感 */
+            padding: 12px 8px;
+            font-weight: 600;
+            white-space: normal;
+
+            /* 垂直居中 */
+            vertical-align: middle;
+        }
+
+        /* 3. 表格内容单元格 */
+        #inputPreview table td,
+        #print-container>table table td,
+        #outputPreview table td {
+            /* 保持与 th 一致的 padding */
+            padding: 12px 8px;
+            border-bottom: 1px solid #ebedf0;
+
+            /* 垂直居中，确保换行后内容依然居中对齐，视觉整齐 */
+            vertical-align: middle;
+
+            /* 允许长单词强行折行，防止撑开表格 */
+            word-break: break-word;
+            /* 增加行高，优化多行文本的阅读体验（高度层面的优化） */
+            line-height: 1.5;
+        }
+
+        /* 4. 交互效果 */
+        #inputPreview table tbody tr:hover,
+        #outputPreview table tbody tr:hover {
+            background-color: #f1f3f5;
+            transition: background-color 0.2s ease;
+        }
+
+        /* 5. 数字列优化 */
+        #inputPreview table td.numeric,
+        #inputPreview table th.numeric,
+        #print-container>table table td.numeric,
+        #print-container>table table th.numeric,
+        #outputPreview table td.numeric,
+        #outputPreview table th.numeric {
+            text-align: right;
+            font-feature-settings: "tnum";
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-container">
+        <div class="row">
+            <div class="block">
+                <div class="block-header">
+                    <span>1. 原文输入</span>
+                    <button id="btnImport" class="icon-btn" onclick="importFile()">📂 导入 (PDF 或 Markdown 文件)</button>
+                </div>
+                <textarea id="inputText" placeholder="# 在此输入 Markdown..." oninput="render('input')"></textarea>
+            </div>
+            <div class="block">
+                <div class="block-header">2. 原文预览</div>
+                <div id="inputPreview" class="preview"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="block">
+                <div class="block-header">3. 译文输出</div>
+                <textarea id="outputText" placeholder="> 翻译结果将在此生成..." oninput="render('output')"></textarea>
+            </div>
+            <div class="block">
+                <div class="block-header">4. 译文预览</div>
+                <div id="outputPreview" class="preview"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="group">
+            <input type="password" id="apiKey" placeholder="请输入GLM API Key" style="width: 135px;">
+            <input type="password" id="MinerU-apiKey" placeholder="请输入MinerU API Key" style="width: 135px;">
+            <select id="modelSelect" onchange="checkCustomModel()">
+                <option value="GLM-4.5-Flash">GLM-4.5-Flash</option>
+                <option value="GLM-4.6V-Flash">GLM-4.6V-Flash</option>
+                <option value="GLM-4.1V-Thinking-Flash">Thinking-Flash</option>
+                <option value="GLM-4-Flash-250414">Flash-250414</option>
+                <option value="GLM-4V-Flash">GLM-4V-Flash</option>
+                <option value="其它">其它</option>
+            </select>
+            <input type="text" id="customModel" placeholder="模型名" style="width: 120px; display: none;">
+        </div>
+
+        <div class="group">
+            <select id="sourceLang" style="width: 150px;">
+                <option>英语(English)</option>
+                <option>简体中文(简体中文)</option>
+                <option>繁体中文(繁體中文)</option>
+                <option>日本语(日本語)</option>
+                <option>朝鲜语(조선어)</option>
+                <option>越南语(Tiếng Việt)</option>
+                <option>泰语(ภาษาไทย)</option>
+                <option>高棉语(ខ្មែរ)</option>
+                <option>马来语(Bahasa Melayu)</option>
+                <option>传统蒙古语(ᠮᠣᠩᠭᠣᠯ ᠬᠡᠯᠡ)</option>
+                <option>藏语(བོད་སྐད།)</option>
+                <option>俄语(Русский)</option>
+                <option>乌克兰语(Українська)</option>
+                <option>法语(Français)</option>
+                <option>德语(Deutsch)</option>
+                <option>西班牙语(Español)</option>
+                <option>意大利语(Italiano)</option>
+                <option>葡萄牙语(Português)</option>
+                <option>荷兰语(Nederlands)</option>
+                <option>瑞典语(Svenska)</option>
+                <option>土耳其语(Türkçe)</option>
+                <option>希腊语(Ελληνικά)</option>
+                <option>犹太语(עברית)</option>
+                <option>阿拉伯语(العربية)</option>
+                <option>印地语(हिन्दी)</option>
+                <option>泰米尔语(தமிழ்)</option>
+                <option>乌尔都语(اُردُو)</option>
+            </select>
+            <span style="color: #666; font-size: 12px;">➡</span>
+            <select id="targetLang" style="width: 150px;">
+                <option>简体中文(简体中文)</option>
+                <option>繁体中文(繁體中文)</option>
+                <option>英语(English)</option>
+                <option>日本语(日本語)</option>
+                <option>朝鲜语(조선어)</option>
+                <option>越南语(Tiếng Việt)</option>
+                <option>泰语(ภาษาไทย)</option>
+                <option>高棉语(ខ្មែរ)</option>
+                <option>马来语(Bahasa Melayu)</option>
+                <option>传统蒙古语(ᠮᠣᠩᠭᠣᠯ ᠬᠡᠯᠡ)</option>
+                <option>藏语(བོད་སྐད།)</option>
+                <option>俄语(Русский)</option>
+                <option>乌克兰语(Українська)</option>
+                <option>法语(Français)</option>
+                <option>德语(Deutsch)</option>
+                <option>西班牙语(Español)</option>
+                <option>意大利语(Italiano)</option>
+                <option>葡萄牙语(Português)</option>
+                <option>荷兰语(Nederlands)</option>
+                <option>瑞典语(Svenska)</option>
+                <option>土耳其语(Türkçe)</option>
+                <option>希腊语(Ελληνικά)</option>
+                <option>犹太语(עברית)</option>
+                <option>阿拉伯语(العربية)</option>
+                <option>印地语(हिन्दी)</option>
+                <option>泰米尔语(தமிழ்)</option>
+                <option>乌尔都语(اُردُو)</option>
+            </select>
+        </div>
+
+        <div class="group">
+            <button class="btn-secondary" id="btnExport" onclick="exportFile()">导出 MD</button>
+            <button class="btn-secondary" id="btnExportPdf" onclick="exportToPdf()">导出 PDF</button>
+            <button class="btn-primary" id="btnStart" onclick="toggleTranslation()">开始翻译</button>
+        </div>
+    </div>
+    <script>
+        function exportToPdf() {
+            var element = document.getElementById('outputPreview');
+            if (!element) {
+                alert("错误：找不到 ID 为 outputPreview 的元素");
+                return;
+            }
+
+            // 1. 创建打印专用容器（覆盖在页面最上层）
+            var printContainer = document.createElement('div');
+            printContainer.id = 'print-container';
+
+            // 2. 构建“表格垫片”结构
+            // 这种结构利用了 thead 在每一页重复的特性来模拟 Margin-Top
+            // 利用 tfoot 在每一页重复的特性来模拟 Margin-Bottom
+            // 侧边距通过 td 的 padding 来实现
+            var htmlContent = element.innerHTML;
+
+            printContainer.innerHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <td>
+                        <div style="height: 20mm; overflow: hidden;">&nbsp;</div>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 0 20mm;"> <div id="print-content-clone">
+                            ${htmlContent}
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>
+                        <div style="height: 20mm; overflow: hidden;">&nbsp;</div>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    `;
+
+            document.body.appendChild(printContainer);
+
+            // 3. 注入打印专用样式
+            var printStyle = document.createElement('style');
+            printStyle.innerHTML = `
+        @media print {
+            /* 关键：强制去除浏览器默认页眉页脚 */
+            @page {
+                size: auto;
+                margin: 0mm; 
+            }
+
+            /* 隐藏原网页所有内容 */
+            body > *:not(#print-container) {
+                display: none !important;
+            }
+
+            /* 显示我们的打印容器 */
+            #print-container {
+                display: block !important;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                background: white;
+                z-index: 99999;
+            }
+            
+            /* 表格样式重置，确保宽度占满 */
+            #print-container table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            
+            /* 保证图片和 SVG 不被切断 */
+            img, svg {
+                break-inside: avoid;
+                max-width: 100%;
+            }
+            
+            /* 你的自定义内容样式可以追加在这里... */
+        }
+        
+        /* 在屏幕上隐藏这个容器，只在打印时用 */
+        @media screen {
+            #print-container {
+                display: none;
+            }
+        }
+    `;
+            document.head.appendChild(printStyle);
+
+            // 4. 执行打印
+            // 稍微延时以确保 DOM 渲染完成（特别是图片）
+            setTimeout(function () {
+                window.print();
+
+                // 5. 打印完成后清理现场（可选）
+                // 为了体验好，通常建议延迟清理，因为打印对话框弹出时 JS 可能会挂起
+                // 如果想保留多次打印能力，也可以不删，下次生成前检查一下 ID 是否存在
+                setTimeout(function () {
+                    document.body.removeChild(printContainer);
+                    document.head.removeChild(printStyle);
+                }, 2000);
+            }, 100);
+        }
+    </script>
+
+    <script>
+        // --- 数学公式保护逻辑 ---
+        // 解决 marked.js 误将 LaTeX 下划线解析为斜体的问题
+        const mathPlaceholders = [];
+
+        function protectMath(text) {
+            mathPlaceholders.length = 0; // 清空数组
+            // 1. 保护块级公式 $$...$$
+            text = text.replace(/\$\$([\s\S]*?)\$\$/g, function (match) {
+                mathPlaceholders.push(match);
+                return "%%%MATH_BLOCK_" + (mathPlaceholders.length - 1) + "%%%";
+            });
+            // 2. 保护行内公式 $...$
+            text = text.replace(/\$([^\n]*?)\$/g, function (match) {
+                mathPlaceholders.push(match);
+                return "%%%MATH_INLINE_" + (mathPlaceholders.length - 1) + "%%%";
+            });
+            return text;
+        }
+
+        function restoreMath(text) {
+            // 还原公式，让 MathJax 渲染
+            return text.replace(/%%%MATH_(BLOCK|INLINE)_(\d+)%%%/g, function (match, type, index) {
+                return mathPlaceholders[index];
+            });
+        }
+
+        // --- 渲染核心 ---
+        let renderTimer;
+
+        function render(type) {
+            clearTimeout(renderTimer);
+            renderTimer = setTimeout(() => {
+                const textId = type === 'input' ? 'inputText' : 'outputText';
+                const previewId = type === 'input' ? 'inputPreview' : 'outputPreview';
+                const text = document.getElementById(textId).value;
+                const preview = document.getElementById(previewId);
+
+                // 1. 保护公式不被 Markdown 解析
+                const protectedText = protectMath(text);
+
+                // 2. 解析 Markdown
+                const html = marked.parse(protectedText);
+
+                // 3. 还原公式
+                preview.innerHTML = restoreMath(html);
+
+                // 4. 立即滚动
+                if (type === 'output') scrollToBottom(preview);
+
+                // 5. MathJax 渲染
+                MathJax.typesetPromise([preview]).then(() => {
+                    if (type === 'output') scrollToBottom(preview);
+                }).catch(err => console.log(err));
+            }, 10);
+        }
+
+        function scrollToBottom(element) {
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function checkCustomModel() {
+            const val = document.getElementById('modelSelect').value;
+            document.getElementById('customModel').style.display = val === '其它' ? 'block' : 'none';
+        }
+
+        // --- Python 交互 ---
+        async function importFile() {
+            toggleLoading(true);
+            try {
+                const mineru_api_key = document.getElementById('MinerU-apiKey').value;
+                const content = await window.pywebview.api.open_file(mineru_api_key);
+                if (content) {
+                    document.getElementById('inputText').value = content;
+                    render('input');
+                }
+            } catch (e) {
+                console.log(e);
+            } finally {
+                setTimeout(() => { toggleLoading(false); }, 800);
+            }
+        }
+
+        async function exportFile() {
+            const content = document.getElementById('outputText').value;
+            const msg = await window.pywebview.api.save_file(content);
+            alert(msg);
+        }
+
+        async function toggleTranslation() {
+            const btn = document.getElementById('btnStart');
+            const isRunning = btn.innerText === "停止生成";
+
+            if (isRunning) {
+                await window.pywebview.api.stop_translation();
+                btn.innerText = "正在停止...";
+                btn.disabled = true;
+            } else {
+                const content = document.getElementById('inputText').value;
+                if (!content.trim()) return alert("请输入需要翻译的 Markdown 内容");
+
+                const apiKey = document.getElementById('apiKey').value;
+                let model = document.getElementById('modelSelect').value;
+                if (model === '其它') model = document.getElementById('customModel').value;
+
+                const src = document.getElementById('sourceLang').value;
+                const tgt = document.getElementById('targetLang').value;
+
+                if (src === tgt) return alert("源语言和目标语言不能相同");
+
+                document.getElementById('outputText').value = "";
+                render('output');
+
+                setUIState(true);
+                window.pywebview.api.start_translation(apiKey, content, model, src, tgt);
+            }
+        }
+
+        // --- 回调函数 ---
+        function onChunkReceived(chunk) {
+            const out = document.getElementById('outputText');
+            out.value += chunk;
+            out.scrollTop = out.scrollHeight;
+            render('output');
+        }
+
+        function onTranslationFinished() {
+            setUIState(false);
+        }
+
+        function onTranslationError(err) {
+            setUIState(false);
+            const out = document.getElementById('outputText');
+            out.value += "\n\n❌ [错误]: " + err;
+            render('output');
+        }
+
+        function setUIState(running) {
+            const btn = document.getElementById('btnStart');
+            const ids = ['btnExport', 'btnImport', 'apiKey', 'MinerU-apiKey', 'modelSelect', 'sourceLang', 'targetLang', 'customModel', 'inputText'];
+
+            if (running) {
+                btn.innerText = "停止生成";
+                btn.className = "btn-danger";
+                btn.disabled = false;
+
+                document.getElementById('outputText').readOnly = true;
+
+                ids.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.disabled = true;
+                    if (el && el.tagName === 'TEXTAREA') el.readOnly = true;
+                });
+            } else {
+                btn.innerText = "开始翻译";
+                btn.className = "btn-primary";
+                btn.disabled = false;
+
+                document.getElementById('outputText').readOnly = false;
+
+                ids.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.disabled = false;
+                    if (el && el.tagName === 'TEXTAREA') el.readOnly = false;
+                });
+            }
+        }
+
+        // 监听 pywebview 准备就绪的事件
+        window.addEventListener('pywebviewready', async function () {
+            try {
+                const zhipu_api_key = await window.pywebview.api.get_api_key_frontend('zhipu-api-key');
+                // 确保 DOM 元素存在再赋值，防止报错
+                const zhipuInput = document.getElementById('apiKey');
+                if (zhipuInput) zhipuInput.value = zhipu_api_key;
+                const mineru_api_key = await window.pywebview.api.get_api_key_frontend('mineru-api-key');
+                const mineruInput = document.getElementById('MinerU-apiKey');
+                if (mineruInput) mineruInput.value = mineru_api_key;
+            } catch (error) {
+                console.error("获取 API Key 失败:", error);
+            }
+        });
+    </script>
+
+</body>
+
+</html>
