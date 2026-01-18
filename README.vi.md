@@ -172,13 +172,15 @@ chmod +x build_macos.sh
 
 ## 👤 Nhà phát triển dự án
 
-* **杜宇** (Tiếng Anh: _Du Yu_; Tiếng Việt: _Đỗ Vũ_)
-* Email: <qluduyu09@163.com> hoặc <11250717@stu.lzjtu.edu.cn>
-* Địa chỉ: Trường Điện tử và Công nghệ Thông tin, Đại học Giao thông Lan Châu (Tiếng Anh: _School of Electronic and Information Engineering, Lanzhou Jiaotong University_; Tiếng Việt: _Đại Học Giao thông Lan Châu, Học Viện Điện Tử Và Công Nghệ Thông Tin_)
+* **Đỗ Vũ** (Tiếng Trung: _杜宇_; Tiếng Anh: _Du Yu_)  
+* Thư điện tử: <qluduyu09@163.com> hoặc <11250717@stu.lzjtu.edu.cn>  
+* Địa chỉ: Học viện Điện tử và Công nghệ Thông tin, Đại học Giao thông Lan Châu  
+  (Tiếng Trung: _兰州交通大学电子与信息工程学院_; Tiếng Anh: _School of Electronic and Information Engineering, Lanzhou Jiaotong University_)
 
 <img src="./splash-screen-v1.0-small.png" style="width:35%;"></img>
 
 ## 📄 Giấy phép
 
-Dự án này tuân theo giấy phép mã nguồn mở. Vui lòng xem tệp [LICENSE](./LICENSE) để biết thêm chi tiết.
+Dự án này tuân theo giấy phép mã nguồn mở. Vui lòng xem tệp [LICENSE](./LICENSE) để biết chi tiết.
+
 
