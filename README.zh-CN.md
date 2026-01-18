@@ -1,6 +1,6 @@
 <p align="center">
   <br>
-  <img src="./npa-icon.png" style="width:26%;">
+  <img src="./npa-icon.png" style="width:22%;">
 </p>
 <br>
 
@@ -29,6 +29,8 @@
 **🖥️ 本地化 GUI 界面**
 * 基于 PyWebview 的轻量级桌面应用。基于 **marked.js** 和 **MathJax** 实现高质量的Markdown渲染与公式显示。
 * 提供文件选择、API Key 管理、翻译对照预览等交互功能。
+
+<img src="./demo.png" style="width:62%;"></img>
 
 ## 💡 使用方法说明
 

@@ -1,6 +1,6 @@
 <p align="center">
   <br>
-  <img src="./npa-icon.png" style="width:26%;">
+  <img src="./npa-icon.png" style="width:22%;">
 </p>
 <br>
 
@@ -29,6 +29,8 @@
 **🖥️ Localized GUI Interface**
 * A lightweight desktop application based on PyWebview. High-quality Markdown rendering and formula display are achieved using **marked.js** and **MathJax**.
 * Provides interactive features such as file selection, API key management, and side-by-side translation preview.
+
+<img src="./demo.png" style="width:62%;"></img>
 
 ## 💡 Usage Instructions
 

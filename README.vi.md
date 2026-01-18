@@ -1,6 +1,6 @@
 <p align="center">
   <br>
-  <img src="./npa-icon.png" style="width:26%;">
+  <img src="./npa-icon.png" style="width:22%;">
 </p>
 <br>
 
@@ -29,6 +29,8 @@
 **🖥️ Giao diện GUI cục bộ**
 * Ứng dụng máy tính để bàn nhẹ, chạy cục bộ, dựa trên PyWebview. Sử dụng **marked.js** và **MathJax** để hiển thị Markdown và công thức toán học với chất lượng cao.
 * Cung cấp các chức năng tương tác như lựa chọn tệp, quản lý API Key, và xem trước song song văn bản gốc cùng bản dịch.
+
+<img src="./demo.png" style="width:62%;"></img>
 
 ## 💡 Hướng dẫn sử dụng
 
