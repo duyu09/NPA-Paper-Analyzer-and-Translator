@@ -30,7 +30,7 @@
 * A lightweight desktop application based on PyWebview. High-quality Markdown rendering and formula display are achieved using **marked.js** and **MathJax**.
 * Provides interactive features such as file selection, API key management, and side-by-side translation preview.
 
-<img src="./demo.png" style="width:62%;"></img>
+<img src="./demo.png" style="width:95%;"></img>
 
 ## 💡 Usage Instructions
 

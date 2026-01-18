@@ -30,7 +30,7 @@
 * Ứng dụng máy tính để bàn nhẹ, chạy cục bộ, dựa trên PyWebview. Sử dụng **marked.js** và **MathJax** để hiển thị Markdown và công thức toán học với chất lượng cao.
 * Cung cấp các chức năng tương tác như lựa chọn tệp, quản lý API Key, và xem trước song song văn bản gốc cùng bản dịch.
 
-<img src="./demo.png" style="width:62%;"></img>
+<img src="./demo.png" style="width:95%;"></img>
 
 ## 💡 Hướng dẫn sử dụng
 

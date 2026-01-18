@@ -30,7 +30,7 @@
 * 基于 PyWebview 的轻量级桌面应用。基于 **marked.js** 和 **MathJax** 实现高质量的Markdown渲染与公式显示。
 * 提供文件选择、API Key 管理、翻译对照预览等交互功能。
 
-<img src="./demo.png" style="width:62%;"></img>
+<img src="./demo.png" style="width:95%;"></img>
 
 ## 💡 使用方法说明
 
