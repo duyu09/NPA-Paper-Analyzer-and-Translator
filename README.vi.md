@@ -93,7 +93,7 @@ NPA-Paper-Analyzer-and-Translator/
 ### 1. Sao chép dự án
 
 ```bash
-git clone https://github.com/your-repo/NPA-Paper-Analyzer-and-Translator.git
+git clone https://github.com/duyu09/NPA-Paper-Analyzer-and-Translator.git
 cd NPA-Paper-Analyzer-and-Translator
 ```
 
